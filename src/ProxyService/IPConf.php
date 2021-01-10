@@ -53,4 +53,19 @@ class IPConf
         }
         return $proxyConf;
     }
+
+    public static function getHomeINET()
+    {
+        $netAdapters = shell_exec("ifconfig");
+        $connections = explode("\n\n",$netAdapters);
+
+        foreach (array_filter($connections) as $connection)
+        {
+            preg_match("@inet (.*?) @si",$connection,$inet);
+            if (isset($inet[1]) && strpos($inet[1],".168.3.")){
+                return $inet[1];
+            }
+        }
+        return null;
+    }
 }

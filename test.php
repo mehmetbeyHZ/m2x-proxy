@@ -2,10 +2,14 @@
 require "vendor/autoload.php";
 
 
-$tp = new \Networking\ProxyService\ThreeProxy();
-$tp = $tp->createConf(true);
-print_r($tp);
+//$tp = new \Networking\ProxyService\ThreeProxy();
+//$tp->setIPV4(\Networking\ProxyService\IPConf::getHomeINET());
+//$tp = $tp->createConf(true);
+//
+//print_r($tp);
 
+$s = shell_exec("sudo supervisorctl start mtproxy");
+print_r($s);
 //$prefix = 100;
 //for ($i = 1; $i <= 100; $i++)
 //{
