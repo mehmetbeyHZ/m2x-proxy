@@ -9,7 +9,7 @@ class IPConf
     /**
      * @return IPConfModel[]
      */
-    protected $unReadModem = ["lo","docker0","enp3s0f1","enp2s0","wlp3s0","wlo1"];
+    protected $unReadModem = ["lo","docker0","enp3s0f1","enp2s0","wlp3s0","wlo1","wlolo"];
     public function getAllConnections($asArray = false): array
     {
         $netAdapters = shell_exec("ifconfig");
