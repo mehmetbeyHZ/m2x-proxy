@@ -1,0 +1,40 @@
+# Default bağlantı seçme
+sudo ip route add default via 192.168.3.1 dev wlo1  
+
+# 3proxy Conf
+monitor logs.txt
+log logs2.txt
+logformat "- +_L%t.%. %N.%p %E %U %C:%c %R:%r %O %I %h %T"
+maxconn 500
+nscache 65536
+timeouts 1 5 30 60 180 1800 15 60
+auth strong
+users login1:CL:pass1
+allow users
+#proxy -n -a -p8090 -i192.168.1.16 -e192.168.42.170
+#proxy -n -a -p8091 -i192.168.1.16 -e192.168.137.174
+#proxy -n -a -p8096 -i192.168.0.1 -e192.168.0.101
+#proxy -a -i0.0.0.0 -p8090 -Deppp0
+proxy -a -i192.168.1.29 -p8091 -Deusb0
+proxy -a -i192.168.1.29 -p8092 -Deusb1
+proxy -a -i192.168.1.29 -p8093 -Deusb2
+flush
+
+# Create Profile : Automatic
+
+# USB MODEM RESET
+> lsusb
+
+Bus 001 Device 006: ID 19d2:0016 ZTE WCDMA Technologies MSM ZTE WCDMA Technologies MSM
+
+> sudo usb_modeswitch -R -v <VENDOR ID> -p <PRODUCT ID> -b <BUS_NUM> -g <DEVICE NUM>
+> sudo usb_modeswitch -R -v 19d2 -p 0016 -b NUM -g NUM
+
+# profil silme
+> nmcli connection delete CONNECTION_NAME
+
+#profil down edip up etme
+nmcli con down static1 ; nmcli con up static2
+
+#profil ekleme
+nmcli con add type ethernet con-name static2 ifname eth0 ip4 192.168.0.108/24 gw4 192.168.0.1
