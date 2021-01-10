@@ -12,7 +12,6 @@ class IPConf
     protected $unReadModem = ["lo","docker0","enp3s0f1","enp2s0","wlp3s0","wlo1"];
     public function getAllConnections($asArray = false): array
     {
-
         $netAdapters = shell_exec("ifconfig");
         $connections = explode("\n\n",$netAdapters);
         $connectionData = [];
