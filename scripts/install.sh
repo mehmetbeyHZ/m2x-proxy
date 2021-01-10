@@ -52,3 +52,7 @@ rm -rf /var/www/html/
 mv m2x-proxy/ /var/www/html/
 
 sudo chmod -R 777 /var/www/html/
+
+cd /var/www/html/
+
+composer install
