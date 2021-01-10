@@ -8,7 +8,7 @@ require "vendor/autoload.php";
 //
 //print_r($tp);
 
-$s = shell_exec("sudo supervisorctl start mtproxy");
+//$s = shell_exec("sudo supervisorctl start mtproxy");
 print_r($s);
 //$prefix = 100;
 //for ($i = 1; $i <= 100; $i++)

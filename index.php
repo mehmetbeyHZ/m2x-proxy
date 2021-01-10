@@ -17,10 +17,11 @@ foreach (PROXY_BALANCER as $balancer)
 ?>
 <br>
 
-
-
 <div class="container">
 <!--    <label>Total <b>--><?//= count($networks) ?><!--</b> Connections </label>-->
+    <?php  foreach (PROXY_BALANCER as $b): ?>
+        <a class="btn black" id="re_conf" data-ipv4="<?=$b['address']?>"><?=$b['address']?> RE_CONF </a>
+    <?php endforeach; ?>
     <table>
         <thead>
         <tr>
@@ -76,6 +77,11 @@ foreach (PROXY_BALANCER as $balancer)
                 let proxy = $(this).attr('data-proxy');
                 let ipv4 = $(this).attr('data-ipv4');
                 $.post("apiv2.php",{key : '123456',action: 'RESET',proxy:proxy,ipv4:ipv4})
+            });
+
+            $("a#re_conf").on('click',function (){
+                let ipv4 = $(this).attr('data-ipv4');
+                $.post("apiv2.php",{key : '123456',action: 'RECONF',proxy:"NO_PROXY",ipv4:ipv4})
             });
 
         });

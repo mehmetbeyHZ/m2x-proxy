@@ -1,6 +1,8 @@
 <?php
 
+use Networking\ProxyService\IPConf;
 use Networking\ProxyService\ModemAPI\ZTEMF667;
+use Networking\ProxyService\ThreeProxy;
 
 require "vendor/autoload.php";
 $apiKey = '123456';
@@ -45,4 +47,12 @@ if(request('action') === 'NETCONF'):
        'networks' => $networks,
        'config' => $proxyConf
     ]);
+endif;
+
+if (request('action') === 'RECONF'):
+    $tp = new ThreeProxy();
+    $tp->setIPV4(IPConf::getHomeINET());
+    $tp = $tp->createConf(true);
+    $restart = shell_exec("sudo supervisorctl restart mtproxy");
+    echo json(['status' => 'ok', 'message' => 'updated and restarted.']);
 endif;
