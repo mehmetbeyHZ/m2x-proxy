@@ -15,9 +15,23 @@
 <body>
 <script>
     $(document).ready(function(){
+        $('.modal').modal();
         $('.sidenav').sidenav();
+        $("#loadingModal").modal({dismissible: false, startingTop: '40%', endingTop: '40%'});
     });
 </script>
+<style>
+    #loadingModal{
+        width: 150px!important;
+        height: 150px!important;
+
+    }
+    .loading_center{
+        height:100%;display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 <nav class="black" style="border-bottom: 1px solid#dbdbdb">
     <div class="nav-wrapper container">
         <a href="#!" class="brand-logo">M2X-PROXY</a>
@@ -42,3 +56,20 @@
     <?php endif; ?>
 </ul>
 
+<div id="loadingModal" class="modal">
+    <div class="center loading_center">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

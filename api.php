@@ -1,5 +1,5 @@
 <?php
-
+ini_set('display_errors',1);
 use Networking\ProxyService\IPConf;
 use Networking\ProxyService\ModemAPI\ZTEMF667;
 use Networking\ProxyService\ThreeProxy;
@@ -77,15 +77,33 @@ if (request('action') === 'IMEI'):
 endif;
 
 if (request('action') === "DATA"):
-    $lastCheck = $_COOKIE['last_data_check' . md5(request('proxy'))] ?? null;
-    if ($lastCheck):
-        echo $_COOKIE['last_data_check' . md5(request('proxy'))];
-        exit;
-    endif;
+//    $lastCheck = $_COOKIE['last_data_check' . md5(request('proxy'))] ?? null;
+//    if ($lastCheck):
+//        echo $_COOKIE['last_data_check' . md5(request('proxy'))];
+//        exit;
+//    endif;
     $zte = new ZTEMF667();
     $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
     $data = $zte->getStatistic();
-    setcookie('last_data_check' . md5(request('proxy')), $data, time() + 120);
-    echo $data;
+    $imei = $zte->getImei();
+    $replace = str_replace(array("\n", ""," "), array(""), $data);
+    preg_match("@realtime_statistics:'(.*?)'@si",$replace,$realtime);
+    $statistic = $realtime[1] ?? "0,0,0,0,0,0,0,0";
+
+    $devices = json_decode(file_get_contents("database/devices.json"),true);
+    $deviceInfo = [];
+
+    $s =  array_search($imei, array_column($devices,'imei'), true);
+    if (is_int($s)){
+        $deviceInfo = $devices[$s];
+    }
+
+    echo json([
+        'imei'     => $imei,
+        'realtime' => $statistic,
+        'charges_total' => formatSizeUnits(explode(",",$statistic)[6]),
+        'device' => $deviceInfo
+    ]);
+
 endif;

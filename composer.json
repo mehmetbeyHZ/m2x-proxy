@@ -16,6 +16,8 @@
         }
     ],
     "require": {
-        "mehmetbeyhz/mclient": "dev-master"
+        "mehmetbeyhz/mclient": "dev-master",
+        "chuyskywalker/rolling-curl": "*",
+      "ext-curl": "*"
     }
 }
