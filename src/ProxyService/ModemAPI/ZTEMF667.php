@@ -59,6 +59,24 @@ class ZTEMF667
             ->getResponse();
     }
 
+    public function getStatistic()
+    {
+        return $this->mClient("refresh_data.asp")
+            ->addParam('now',time())
+            ->execute()
+            ->getResponse();
+    }
+
+    public function getImei()
+    {
+        $response = $this->mClient("status/basicstatus.asp")
+            ->execute()
+            ->getResponse();
+
+        preg_match("@var imei = '(.*?)';@si",$response,$imei);
+        return $imei[1] ?? null;
+    }
+
     public function getSMS()
     {
         $response =  $this->mClient("sms_xml/nv_inbox.xml")
@@ -78,6 +96,8 @@ class ZTEMF667
         }
         return $smsData;
     }
+
+
 
     public function disconnect()
     {

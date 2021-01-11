@@ -9,23 +9,23 @@ require __DIR__ . "/app/header.php";
 //$networks = $ip->getAllConnections();
 //$proxyConf = $ip->proxyConfParse();
 
-foreach (PROXY_BALANCER as $balancer)
-{
-    $data = (new \Networking\ProxyBalancer())->balancerRequest($balancer['address'],"NETCONF",$balancer['key'],"NO_PROXY");
-    $balancers[] = json_decode($data,true);
+foreach (PROXY_BALANCER as $balancer) {
+    $data = (new \Networking\ProxyBalancer())->balancerRequest($balancer['address'], "NETCONF", $balancer['key'], "NO_PROXY");
+    $balancers[] = json_decode($data, true);
 }
 ?>
 <br>
 
 <div class="container">
-<!--    <label>Total <b>--><?//= count($networks) ?><!--</b> Connections </label>-->
-    <?php  foreach (PROXY_BALANCER as $b): ?>
-        <a class="btn black" id="re_conf" data-ipv4="<?=$b['address']?>"><?=$b['address']?> RE_CONF </a>
+    <!--    <label>Total <b>--><? //= count($networks) ?><!--</b> Connections </label>-->
+    <?php foreach (PROXY_BALANCER as $b): ?>
+        <a class="btn black" id="re_conf" data-ipv4="<?= $b['address'] ?>"><?= $b['address'] ?> RE_CONF </a>
     <?php endforeach; ?>
     <table>
         <thead>
         <tr>
             <th>ConnectionName</th>
+            <th>IMEI</th>
             <th>INET</th>
             <th>NETMASK</th>
             <th>Detail</th>
@@ -35,56 +35,115 @@ foreach (PROXY_BALANCER as $balancer)
 
         <tbody>
         <?php foreach ($balancers as $balancer): ?>
-            <?php foreach ($balancer['networks'] as $net):?>
+            <?php foreach ($balancer['networks'] as $net): ?>
                 <tr>
-                    <td><?=($net['cName'])?></td>
-                    <td><?=($net['inet'])?></td>
-                    <td><?=($net['broadcast'])?></td>
+                    <td><?= ($net['cName']) ?></td>
                     <td>
-                        <?php if (isset($balancer['config'][$net['cName']])): $getConf = $balancer['config'][$net['cName']]?>
-                            <span class="badge new blue" data-badge-caption="IP: <?=$getConf['ip']?>"></span>
-                            <span class="badge new blue" data-badge-caption="PORT: <?=$getConf['port']?>"></span>
-                            <span class="badge new blue" data-badge-caption="<?=$getConf['device']?>"></span>
+                        <?php if (isset($balancer['config'][$net['cName']])): $getConf = $balancer['config'][$net['cName']] ?>
+                            <script>
+                                $(function () {
+                                    let myv4 = '<?=$getConf['ip']?>'
+                                    let proxy = 'login1:pass1@<?=$getConf['ip'] . ":" . $getConf["port"]?>'
+                                    $.post("apiv2.php", {
+                                        key: '123456',
+                                        action: 'IMEI',
+                                        proxy: proxy,
+                                        ipv4: myv4
+                                    }, function (imei) {
+                                        $("a#imei<?=md5($getConf['ip'] . $getConf["port"])?>").html(imei);
+                                    });
+                                })
+                            </script>
+                            <a href="" id="imei<?= md5($getConf['ip'] . $getConf["port"]) ?>">000000000000000</a>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= ($net['inet']) ?></td>
+                    <td><?= ($net['broadcast']) ?></td>
+                    <td>
+                        <?php if (isset($balancer['config'][$net['cName']])): $getConf = $balancer['config'][$net['cName']] ?>
+                            <span class="badge new blue" data-badge-caption="IP: <?= $getConf['ip'] ?>"></span>
+                            <span class="badge new blue" data-badge-caption="PORT: <?= $getConf['port'] ?>"></span>
+                            <span class="badge new blue" data-badge-caption="<?= $getConf['device'] ?>"></span>
 
-                        <?php else:?>
+                            <script>
+                                $(function () {
+                                    let myv4 = '<?=$getConf['ip']?>'
+                                    let proxy = 'login1:pass1@<?=$getConf['ip'] . ":" . $getConf["port"]?>'
+                                    $.post("apiv2.php", {
+                                        key: '123456',
+                                        action: 'DATA',
+                                        proxy: proxy,
+                                        ipv4: myv4
+                                    }, function (data) {
+                                        eval("json=" + data);
+                                        console.log(json);
+                                        let statistic = json.realtime_statistics;
+                                        let items = statistic.split(",");
+                                        $("#total<?=md5($getConf['ip'] . $getConf["port"])?>").html(transUnit(items[6]) + "MB")
+                                    });
+                                })
+
+                            </script>
+                            <a class="btn black right" id="total<?= md5($getConf['ip'] . $getConf["port"]) ?>">.. MB</a>
+                        <?php else: ?>
                             NO CONFIGURATION
                         <?php endif; ?>
                     </td>
                     <td class="center">
-                        <?php if(isset($balancer['config'][$net['cName']])): ?>
-                            <a class="btn blue" id="restartProxy" data-ipv4="<?=$getConf['ip']?>" data-proxy="login1:pass1@<?=$getConf['ip'].":".$getConf["port"]?>">RESTART</a>
+                        <?php if (isset($balancer['config'][$net['cName']])): ?>
+                            <a class="btn blue" id="restartProxy" data-ipv4="<?= $getConf['ip'] ?>"
+                               data-proxy="login1:pass1@<?= $getConf['ip'] . ":" . $getConf["port"] ?>">RESTART</a>
                             <a class="btn blue darken-2" id="checkProxy">CHECK</a>
-                            <a class="btn yellow darken-2 black-text" id="getSms" data-ipv4="<?=$getConf['ip']?>" data-proxy="login1:pass1@<?=$getConf['ip'].":".$getConf["port"]?>">SMS</a>
-                        <?php endif;?>
+                            <a class="btn yellow darken-2 black-text" id="getSms" data-ipv4="<?= $getConf['ip'] ?>"
+                               data-proxy="login1:pass1@<?= $getConf['ip'] . ":" . $getConf["port"] ?>">SMS</a>
+                        <?php endif; ?>
                     </td>
+
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>
         </tbody>
     </table>
     <script>
-        $(function (){
+        $(function () {
 
-            $("a#getSms").on('click',function (){
-               let proxy = $(this).attr('data-proxy');
-                let ipv4 = $(this).attr('data-ipv4');
-                $.post("apiv2.php",{key : '123456',action: 'SMS',proxy:proxy,ipv4:ipv4},function (data){
-
-               });
-            });
-
-            $("a#restartProxy").on('click',function (){
+            $("a#getSms").on('click', function () {
                 let proxy = $(this).attr('data-proxy');
                 let ipv4 = $(this).attr('data-ipv4');
-                $.post("apiv2.php",{key : '123456',action: 'RESET',proxy:proxy,ipv4:ipv4})
+                $.post("apiv2.php", {key: '123456', action: 'SMS', proxy: proxy, ipv4: ipv4}, function (data) {
+
+                });
             });
 
-            $("a#re_conf").on('click',function (){
+            $("a#restartProxy").on('click', function () {
+                let proxy = $(this).attr('data-proxy');
                 let ipv4 = $(this).attr('data-ipv4');
-                $.post("apiv2.php",{key : '123456',action: 'RECONF',proxy:"NO_PROXY",ipv4:ipv4})
+                $.post("apiv2.php", {key: '123456', action: 'RESET', proxy: proxy, ipv4: ipv4})
+            });
+
+            $("a#re_conf").on('click', function () {
+                let ipv4 = $(this).attr('data-ipv4');
+                $.post("apiv2.php", {key: '123456', action: 'RECONF', proxy: "NO_PROXY", ipv4: ipv4})
             });
 
         });
+
+        function transUnit(data) {
+            var level = 0;
+            var value = Number(data);
+            console.log(value)
+            var cal = function () {
+                if (value >= 1024 && level != 3) {
+                    value = value / 1024;
+                    level += 1;
+                    cal();
+                }
+            }
+
+            cal();
+            return (Math.round(value * 100) / 100)
+        }
+
     </script>
 </div>
 

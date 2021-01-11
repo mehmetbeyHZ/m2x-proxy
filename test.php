@@ -8,8 +8,11 @@ require "vendor/autoload.php";
 //
 //print_r($tp);
 
+echo formatSizeUnits(571041755);
+
+
 //$s = shell_exec("sudo supervisorctl start mtproxy");
-print_r($s);
+//print_r($s);
 //$prefix = 100;
 //for ($i = 1; $i <= 100; $i++)
 //{
