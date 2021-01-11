@@ -110,7 +110,7 @@ if (isset($_GET['_'])) {
     <script>
         $(function () {
             let connectedIMEI = [];
-            $.get("home.php", {"_": true}, function (data) {
+            $.get("index.php", {"_": true}, function (data) {
                 $("div#preloader").html('');
                 let myData = JSON.parse(data);
                 for (let i = 0; i < myData.length; i++) {
