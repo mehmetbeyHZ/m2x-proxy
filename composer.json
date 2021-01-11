@@ -1,23 +1,24 @@
 {
-    "name": "mtks/networking",
-    "description": "Network Manager",
-    "autoload": {
-        "psr-4": {
-            "Networking\\" : "src"
-        },
-        "files": ["src/helper.php",
-          "app/bootstrap.php"
-        ]
+  "name": "mtks/networking",
+  "description": "Network Manager",
+  "autoload": {
+    "psr-4": {
+      "Networking\\": "src"
     },
-    "authors": [
-        {
-            "name": "mehmetbeyhz",
-            "email": "mehmetbeyhz@gmail.com"
-        }
-    ],
-    "require": {
-        "mehmetbeyhz/mclient": "dev-master",
-        "chuyskywalker/rolling-curl": "*",
-      "ext-curl": "*"
+    "files": [
+      "src/helper.php",
+      "app/bootstrap.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "mehmetbeyhz",
+      "email": "mehmetbeyhz@gmail.com"
     }
+  ],
+  "require": {
+    "mehmetbeyhz/mclient": "dev-master",
+    "ext-curl": "*",
+    "mehmetbeyhz/rolling-curlx": "dev-master"
+  }
 }
