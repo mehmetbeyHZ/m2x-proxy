@@ -11,9 +11,6 @@ require "vendor/autoload.php";
 //echo formatSizeUnits(571041755);
 
 
-$rollingCurl = new \RollingCurl\RollingCurl();
-
-
 
 
 //$s = shell_exec("sudo supervisorctl start mtproxy");

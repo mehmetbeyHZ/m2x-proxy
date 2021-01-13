@@ -27,6 +27,10 @@ if (isset($_GET['_'])) {
     $r = new \RollingCurl\RollingCurl();
 
     foreach ($configs as $server) {
+        if (!isset($server['response']['networks']))
+        {
+            continue;
+        }
         foreach ($server['response']['networks'] as $network) {
             $networkName = $network['cName'];
             if (isset($server['response']['config'][$networkName])) {
@@ -72,6 +76,7 @@ if (isset($_GET['_'])) {
         <?php foreach (PROXY_BALANCER as $b) : ?>
             <a class="btn black" id="re_conf" data-ipv4="<?= $b['address'] ?>"><?= $b['address'] ?> RE_CONF </a>
         <?php endforeach; ?>
+        <div id="totalConn"></div>
         <table id="example" class="display" style="width:100%">
             <thead>
             <tr>
@@ -113,6 +118,7 @@ if (isset($_GET['_'])) {
             $.get("index.php", {"_": true}, function (data) {
                 $("div#preloader").html('');
                 let myData = JSON.parse(data);
+                $("div#totalConn").html(myData.length + "Connection");
                 for (let i = 0; i < myData.length; i++) {
                     let item = myData[i];
 
