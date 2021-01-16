@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mehmetbeyHZ/mClient.git",
-                "reference": "cf6c1e31b86985d7ab868b30b2d98caa548d0fb8"
+                "reference": "4d5cc273d15b2c5904830a7e1b150b0f4989497c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mehmetbeyHZ/mClient/zipball/cf6c1e31b86985d7ab868b30b2d98caa548d0fb8",
-                "reference": "cf6c1e31b86985d7ab868b30b2d98caa548d0fb8",
+                "url": "https://api.github.com/repos/mehmetbeyHZ/mClient/zipball/4d5cc273d15b2c5904830a7e1b150b0f4989497c",
+                "reference": "4d5cc273d15b2c5904830a7e1b150b0f4989497c",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
                 "issues": "https://github.com/mehmetbeyHZ/mClient/issues",
                 "source": "https://github.com/mehmetbeyHZ/mClient/tree/master"
             },
-            "time": "2020-05-25T01:19:20+00:00"
+            "time": "2021-01-16T14:01:48+00:00"
         },
         {
             "name": "mehmetbeyhz/rolling-curlx",

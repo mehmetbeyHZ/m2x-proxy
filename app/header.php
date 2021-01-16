@@ -17,7 +17,8 @@
     $(document).ready(function(){
         $('.modal').modal();
         $('.sidenav').sidenav();
-        $("#loadingModal").modal({dismissible: false, startingTop: '40%', endingTop: '40%'});
+        $("#loadingModal").modal({dismissible: true, startingTop: '40%', endingTop: '40%'});
+        $('.dropdown-trigger').dropdown();
     });
 </script>
 <style>
@@ -30,6 +31,10 @@
         height:100%;display: flex;
         align-items: center;
         justify-content: center;
+    }
+    .wg_shadow {
+        -webkit-box-shadow: 0 1px 15px 1px rgba(81, 77, 92, .08);
+        box-shadow: 0 1px 15px 1px rgba(81, 77, 92, .08);
     }
 </style>
 <nav class="black" style="border-bottom: 1px solid#dbdbdb">

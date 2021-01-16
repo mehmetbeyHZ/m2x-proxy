@@ -46,6 +46,11 @@ class ThreeProxy
         $TPConfBuilder->setLine("nscache 65536");
         $TPConfBuilder->setLine("timeouts 1 5 30 60 180 1800 15 60");
         $TPConfBuilder->setAuth("login1","pass1");
+        $TPConfBuilder->setLine("users ".ROOT_PROXYUSR.":CL:".ROOT_PROXYUSRPWD);
+        $TPConfBuilder->setLine("deny login1 * 192.168.0.1 *");
+        $TPConfBuilder->setLine("allow ".ROOT_PROXYUSR." 192.168.0.1 *");
+        $TPConfBuilder->setLine("allow login1");
+        $TPConfBuilder->setLine("allow ".ROOT_PROXYUSR);
         $TPConfBuilder->setLine($this->createRoutes());
         $TPConfBuilder->setLine("flush");
         if ($save)

@@ -16,7 +16,6 @@ class TPConfBuilder
     {
         $this->setLine("auth strong");
         $this->setLine("users $username:CL:$password");
-        $this->setLine("allow $username");
     }
 
     public function setLogs($file = 'logs.txt')

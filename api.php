@@ -28,7 +28,6 @@ if (request('action') === 'RESET'):
     $zte->disconnect();
     sleep(10);
     $zte->connect();
-    sleep(10);
     echo json(['status' => 'ok', 'message' => 'reset successful']);
 endif;
 
