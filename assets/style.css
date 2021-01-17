@@ -4,3 +4,73 @@ td{
 thead tr th{
     border: 2px solid #dbdbdb!important;
 }
+
+input {
+    width: 100% !important;
+    line-height: 40px !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+    color: #222 !important;
+    border: 1px solid #f4f5fe !important;
+    border-radius: 5px !important;
+    box-shadow: none !important;
+    background: #f4f5fe!important;
+}
+
+textarea{
+    width: 100% !important;
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+    color: #222 !important;
+    border: 1px solid #f4f5fe !important;
+    border-radius: 5px !important;
+    box-shadow: none !important;
+    background: #f4f5fe!important;
+}
+
+input:focus {
+    outline: 0 !important;
+    border-color: #dee0f6 !important
+}
+
+input:valid + label::before {
+    line-height: 20px !important;
+    font-size: 12px !important;
+    top: -10px !important;
+    background: #fff !important;
+    padding: 0 6px !important;
+    left: 9px !important;
+    content: attr(data-title) !important
+}
+
+input:focus + label::before {
+    line-height: 20px !important;
+    font-size: 12px !important;
+    top: -10px !important;
+    background: #fff !important;
+    color: #00f !important;
+    padding: 0 6px !important;
+    left: 9px !important
+}
+
+input:disabled + label::before {
+    line-height: 20px !important;
+    font-size: 12px !important;
+    top: -10px !important;
+    background: #fff !important;
+    color: #6d6d6d !important;
+    padding: 0 6px !important;
+    left: 9px !important
+}
+
+input:read-only + label::before {
+    line-height: 20px !important;
+    font-size: 12px !important;
+    top: -10px !important;
+    background: #fff !important;
+    color: #6d6d6d !important;
+    padding: 0 6px !important;
+    left: 9px !important
+}

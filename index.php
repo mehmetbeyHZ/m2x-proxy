@@ -36,7 +36,7 @@ if (isset($_GET['_'])) {
                 $conf = $server['response']['config'][$networkName];
                 $ip = $conf['ip'];
                 $port = $conf['port'];
-                $proxyUri = ROOT_PROXYUSR.':'.ROOT_PROXYUSRPWD.'@' . $ip . ':' . $port;
+                $proxyUri = ROOT_PROXYUSR . ':' . ROOT_PROXYUSRPWD . '@' . $ip . ':' . $port;
                 $userData = ['network' => $network, 'config' => $conf, 'balancer' => $server['balancer'], 'proxy' => $proxyUri];
 
                 $postData = http_build_query([
@@ -68,6 +68,10 @@ if (isset($_GET['_'])) {
 } else {
     require "app/header.php";
     ?>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+    <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.22/type-detection/file-size.js"></script>
     <div style="width: 100%; text-align: center;padding: 10px; background: #433efe; margin-top: -2px; margin-bottom: 5px; color: white">
         <div id="totalConn">Checking...</div>
     </div>
@@ -88,7 +92,8 @@ if (isset($_GET['_'])) {
                         <span class="new badge blue" id="totalSelected" data-badge-caption="0"></span>
                     </div>
 
-                    <a class='dropdown-trigger btn right blue' href='#' data-target='dropdown1'><i class="material-icons right">expand_more</i>ÇOKLU İŞLEM</a>
+                    <a class='dropdown-trigger btn right blue' href='#' data-target='dropdown1'><i
+                                class="material-icons right">expand_more</i>ÇOKLU İŞLEM</a>
 
                 </div>
             </div>
@@ -102,14 +107,13 @@ if (isset($_GET['_'])) {
     </ul>
 
 
-
     <div class="container">
         <table id="example" class="display" style="width:100%">
             <thead>
             <tr>
                 <th class="center">
                     <label>
-                        <input type="checkbox" id="selectProxies" />
+                        <input type="checkbox" id="selectProxies"/>
                         <span style="padding-left: 18px!important;"></span>
                     </label>
                 </th>
@@ -147,8 +151,35 @@ if (isset($_GET['_'])) {
 
     <script>
         let selectedOrderIds = [];
+        jQuery.fn.dataTable.ext.type.order['file-size-pre'] = function ( data ) {
+            var matches = data.match( /^(\d+(?:\.\d+)?)\s*([a-z]+)/i );
+            var multipliers = {
+                b:  1,
+                bytes: 1,
+                kb: 1000,
+                kib: 1024,
+                mb: 1000000,
+                mib: 1048576,
+                gb: 1000000000,
+                gib: 1073741824,
+                tb: 1000000000000,
+                tib: 1099511627776,
+                pb: 1000000000000000,
+                pib: 1125899906842624
+            };
+
+            if (matches) {
+                var multiplier = multipliers[matches[2].toLowerCase()];
+                return parseFloat( matches[1] ) * multiplier;
+            } else {
+                return -1;
+            };
+        };
         $(function () {
+
+
             let connectedIMEI = [];
+
             $.get("index.php", {"_": true}, function (data) {
                 $("div#preloader").html('');
                 let myData = JSON.parse(data);
@@ -177,6 +208,12 @@ if (isset($_GET['_'])) {
                 </td>
             </tr>`);
                 }
+                $("table#example").DataTable({
+                    "columnDefs": [
+                        { "type": "file-size", "targets": 0 }
+                    ],
+                    paging: false
+                });
             })
 
             $("body").delegate("a#getSms", "click", function () {
@@ -228,90 +265,85 @@ if (isset($_GET['_'])) {
                 })
             });
 
-            $("#selectProxies").on('click',function (e) {
-                let isChecked =  $("input#selectProxies").is(':checked');
-                if(isChecked)
-                {
-                    $("input.proxySelector").prop("checked",true);
-                }else{
-                    $("input.proxySelector").prop("checked",false);
+            $("#selectProxies").on('click', function (e) {
+                let isChecked = $("input#selectProxies").is(':checked');
+                if (isChecked) {
+                    $("input.proxySelector").prop("checked", true);
+                } else {
+                    $("input.proxySelector").prop("checked", false);
                 }
 
-                while(selectedOrderIds.length > 0) {
+                while (selectedOrderIds.length > 0) {
                     selectedOrderIds.pop();
                 }
-                $.each($("input[class='proxySelector']:checked"),function () {
+                $.each($("input[class='proxySelector']:checked"), function () {
                     selectedOrderIds.push($(this).attr('data-imei'));
                 });
-                $("#totalSelected").attr('data-badge-caption',selectedOrderIds.length);
+                $("#totalSelected").attr('data-badge-caption', selectedOrderIds.length);
             });
 
-            $("body").delegate('input.proxySelector','click',function (){
-                while(selectedOrderIds.length > 0) {
+            $("body").delegate('input.proxySelector', 'click', function () {
+                while (selectedOrderIds.length > 0) {
                     selectedOrderIds.pop();
                 }
-                $.each($("input[class='proxySelector']:checked"),function () {
+                $.each($("input[class='proxySelector']:checked"), function () {
                     selectedOrderIds.push($(this).attr('data-imei'));
                 });
-                $("#totalSelected").attr('data-badge-caption',selectedOrderIds.length);
+                $("#totalSelected").attr('data-badge-caption', selectedOrderIds.length);
             });
 
         })
 
 
-        function selectedOrders()
-        {
-            while(selectedOrderIds.length > 0) {
+        function selectedOrders() {
+            while (selectedOrderIds.length > 0) {
                 selectedOrderIds.pop();
             }
-            $.each($("input[class='proxySelector']:checked"),function () {
+            $.each($("input[class='proxySelector']:checked"), function () {
                 selectedOrderIds.push($(this).attr('data-imei'));
             });
-            $("#totalSelected").attr('data-badge-caption',selectedOrderIds.length);
+            $("#totalSelected").attr('data-badge-caption', selectedOrderIds.length);
         }
 
-        $("a#multiAction").on('click',function (){
+        $("a#multiAction").on('click', function () {
             selectedOrders()
             let type = $(this).attr("data-action");
             $("#loadingModal").modal('open');
             let resetItems = [];
-            $("input.proxySelector").prop('checked',false);
-            $("input#selectProxies").prop('checked',false);
-            for (let i = 0; i < selectedOrderIds.length; i++)
-            {
+            $("input.proxySelector").prop('checked', false);
+            $("input#selectProxies").prop('checked', false);
+            for (let i = 0; i < selectedOrderIds.length; i++) {
                 let imei = selectedOrderIds[i];
-                let field = $("#proxyI"+imei);
+                let field = $("#proxyI" + imei);
                 let balancer = field.attr('data-balancer');
                 let balancerKey = field.attr('data-bkey');
                 let proxy = field.attr('data-proxy');
 
-                resetItems.push({proxy,balancer,balancerKey})
+                resetItems.push({proxy, balancer, balancerKey})
             }
-            $.post("multiAction.php",{data:resetItems,type},function (data){
+            $.post("multiAction.php", {data: resetItems, type}, function (data) {
                 $("#loadingModal").modal('close');
                 let resp = JSON.parse(data);
-                if (type === 'CHECK')
-                {
+                if (type === 'CHECK') {
                     $("#actionInfoModal").modal('open');
-                    let online  = 0;
+                    let online = 0;
                     let offline = 0;
-                    for (let i = 0; i < resp.length; i++)
-                    {
+                    for (let i = 0; i < resp.length; i++) {
                         let item = resp[i];
                         try {
                             let itemResponse = JSON.parse(item.response);
                             online++;
-                        }catch (e){
+                        } catch (e) {
                             console.log(e);
                             offline++;
-                            $("td[data-proxy=\""+item.balancer.proxy+"\"] input").prop('checked',true);
+                            $("td[data-proxy=\"" + item.balancer.proxy + "\"] input").prop('checked', true);
                         }
                     }
                     $("a#checkedTotalOffline").html(offline);
                     $("a#checkedTotalOnline").html(online);
 
-                }else{
-                    M.toast({html:'OK'});
+                } else {
+                    M.toast({html: 'OK'});
                 }
                 selectedOrders()
             });
