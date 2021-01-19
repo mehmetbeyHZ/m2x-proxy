@@ -1,5 +1,6 @@
 # Default bağlantı seçme
 sudo ip route add default via 192.168.3.1 dev wlo1  
+sudo ip route add default via 192.168.3.1 dev enp3s0
 
 # 3proxy Conf
 monitor logs.txt
