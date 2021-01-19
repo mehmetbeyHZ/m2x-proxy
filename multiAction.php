@@ -6,18 +6,17 @@ require "vendor/autoload.php";
 
 if ($_POST)
 {
-    $multi   = new \MClient\MultiRequest();
+    $rc = new \RollingCurl\RollingCurl();
     if (request('type') === 'RESTART')
     {
         foreach (post('data') as $balancer){
 
-            $multi->add((new Request("http://".$balancer['balancer']."/api.php"))
-                ->addPost('action',"RESET")
-                ->addPost('key',$balancer['balancerKey'])
-                ->addPost('proxy',$balancer['proxy'])
-                ->addCurlOptions(CURLOPT_TIMEOUT,60)
-                ->setIdentifierParams(['balancer' => $balancer])
-            );
+            $data = http_build_query([
+                "action" => "RESET",
+                "key" => $balancer["balancerKey"],
+                "proxy" => $balancer["proxy"]
+            ]);
+            $rc->post("http://".$balancer['balancer']."/api.php",$data,[],[CURLOPT_TIMEOUT => 20],['balancer' => $balancer]);
 
         }
     }
@@ -25,20 +24,24 @@ if ($_POST)
     {
         foreach (post('data') as $proxies)
         {
-            $multi->add((new Request("http://ip-api.com/json/"))
-                ->setProxy($proxies['proxy'])
-                ->setIdentifierParams($proxies)
-            );
+            $rc->get("http://ip-api.com/json/",[],[CURLOPT_PROXY => $proxies['proxy']],$proxies);
         }
     }
-    $exec = $multi->execute();
     $responses = [];
-    foreach ($exec as $item){
+
+    $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl)  use(&$responses){
+
         $responses[] = [
-            'response' => $item->getResponseText(),
-            'balancer' => $item->getIdentifierParams()
+            'response' => $request->getResponseText(),
+            'balancer' => $request->identifierParams
         ];
-    }
+        $rollingCurl->prunePendingRequestQueue();
+        $rollingCurl->clearCompleted();
+    });
+    $rc->setSimultaneousLimit(100);
+    $rc->execute();
+
+
 
     echo json($responses);
 }

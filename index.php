@@ -10,7 +10,7 @@ if (isset($_GET['_'])) {
             'key' => $balancer['key'],
             'proxy' => "NO_PROXY"
         ]);
-        $r->post("http://{$balancer['address']}/api.php", $data, [], [CURLOPT_TIMEOUT => 10], $balancer);
+        $r->post("http://{$balancer['address']}/api.php", $data, [], [CURLOPT_TIMEOUT => 20], $balancer);
     }
     $configs = [];
     $r->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl) use (&$configs) {
@@ -21,7 +21,7 @@ if (isset($_GET['_'])) {
         $rollingCurl->prunePendingRequestQueue();
         $rollingCurl->clearCompleted();
     });
-    $r->setSimultaneousLimit(100);
+    $r->setSimultaneousLimit(50);
     $r->execute();
 
     $r = new \RollingCurl\RollingCurl();
@@ -45,7 +45,7 @@ if (isset($_GET['_'])) {
                     'proxy' => $proxyUri
                 ]);
 
-                $r->post("http://{$server['balancer']['address']}/api.php", $postData, [], [CURLOPT_TIMEOUT => 10], $userData);
+                $r->post("http://{$server['balancer']['address']}/api.php", $postData, [], [CURLOPT_TIMEOUT => 20], $userData);
             }
         }
     }
@@ -61,7 +61,7 @@ if (isset($_GET['_'])) {
         $rollingCurl->prunePendingRequestQueue();
         $rollingCurl->clearCompleted();
     });
-    $r->setSimultaneousLimit(100);
+    $r->setSimultaneousLimit(50);
     $r->execute();
 
     echo json($lastInfo);
@@ -186,6 +186,28 @@ if (isset($_GET['_'])) {
                 $("div#totalConn").html(myData.length + " Connection");
                 for (let i = 0; i < myData.length; i++) {
                     let item = myData[i];
+
+                    if(item.info == null)
+                    {
+                        $("tbody#proxies").append(`<tr>
+                        <td class="center">
+
+                        </td>
+                        <td>${item.identifier.network.cName}</td>
+                        <td>n/A</td>
+                        <td>n/A</td>
+                        <td>${item.identifier.network.inet}</td>
+                        <td>n/A</td>
+                        <td>${item.identifier.proxy}</td>
+                <td class="center">
+                    <a id="resetProxy" class="btn blue" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">RESTART</a>
+                    <a  id="checkProxy" class="btn blue darken-2" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">CHECK</a>
+                    <a id="getSms" data-phone="000" class="btn yellow darken-2 black-text" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">SMS</a>
+                </td>
+</tr>`);
+
+                        continue
+                    }
 
                     connectedIMEI.push(item.info.imei);
                     $("tbody#proxies").append(`<tr>
