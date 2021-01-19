@@ -2,10 +2,10 @@
 require "vendor/autoload.php";
 
 
-$tp = new \Networking\ProxyService\ThreeProxy();
-$tp->setIPV4(\Networking\ProxyService\IPConf::getHomeINET());
-$tp = $tp->createConf(false);
-print_r($tp);
+//$tp = new \Networking\ProxyService\ThreeProxy();
+//$tp->setIPV4(\Networking\ProxyService\IPConf::getHomeINET());
+//$tp = $tp->createConf(false);
+//print_r($tp);
 //
 //print_r($tp);
 
