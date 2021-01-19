@@ -5,7 +5,7 @@ use Networking\ProxyBalancer;
 $m = new Middleware();
 $b = new ProxyBalancer();
 
-$b->setBalancer("192.168.3.12","123456");
+$b->setBalancer("192.168.3.30","123456");
 //$b->setBalancer("192.168.3.42","123456");
 
 define("PROXY_BALANCER",$b->getAllBalancer());
