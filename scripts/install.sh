@@ -45,6 +45,10 @@ sudo supervisorctl update
 echo "RESTARTING SUPERVISORCTL..."
 sudo supervisorctl restart mtproxy
 
+sudo apt-get install redis-server
+
+sudo apt-get install php-redis
+
 git clone https://github.com/mehmetbeyHZ/m2x-proxy.git
 
 rm -rf /var/www/html/
@@ -56,3 +60,4 @@ sudo chmod -R 777 /var/www/html/
 cd /var/www/html/
 
 composer install
+
