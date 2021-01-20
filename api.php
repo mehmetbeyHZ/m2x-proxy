@@ -79,7 +79,7 @@ if (request('action') === "DATA"):
 
     $proxyHASH = md5(request('proxy'));
     $saved     = redisGet("DATA_".$proxyHASH);
-    if ($saved):
+    if ($saved !== null):
         echo $saved;
         return;
     endif;
