@@ -2,6 +2,31 @@
 
 use Networking\Components\Http\Session;
 
+function redis()
+{
+    $redis = new Predis\Client();
+    $redis->connect();
+    return $redis;
+}
+
+function redisSave($key,$value,$ttl = null)
+{
+    $redis = redis();
+    $redis->set($key,$value);
+    if ($ttl !== null && is_numeric($ttl))
+    {
+        $redis->expire($key,$ttl);
+    }
+}
+
+function redisGet($key,$default = null)
+{
+    $redis = redis();
+    $has = $redis->exists($key);
+    return $has === 1 ? $redis->get($key) : $default;
+}
+
+
 function session($key, $value = null)
 {
     $session = new Session();

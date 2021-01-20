@@ -3,14 +3,14 @@ require "vendor/autoload.php";
 ini_set('display_errors', 1);
 if (isset($_GET['_'])) {
     $r = new \RollingCurl\RollingCurl();
-
+    $timeout = 20;
     foreach (PROXY_BALANCER as $balancer) {
         $data = http_build_query([
             'action' => 'NETCONF',
             'key' => $balancer['key'],
             'proxy' => "NO_PROXY"
         ]);
-        $r->post("http://{$balancer['address']}/api.php", $data, [], [CURLOPT_TIMEOUT => 20], $balancer);
+        $r->post("http://{$balancer['address']}/api.php", $data, [], [CURLOPT_TIMEOUT => $timeout], $balancer);
     }
     $configs = [];
     $r->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl) use (&$configs) {
@@ -45,7 +45,7 @@ if (isset($_GET['_'])) {
                     'proxy' => $proxyUri
                 ]);
 
-                $r->post("http://{$server['balancer']['address']}/api.php", $postData, [], [CURLOPT_TIMEOUT => 20], $userData);
+                $r->post("http://{$server['balancer']['address']}/api.php", $postData, [], [CURLOPT_TIMEOUT => $timeout], $userData);
             }
         }
     }

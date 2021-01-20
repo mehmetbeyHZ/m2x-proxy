@@ -76,11 +76,14 @@ if (request('action') === 'IMEI'):
 endif;
 
 if (request('action') === "DATA"):
-//    $lastCheck = $_COOKIE['last_data_check' . md5(request('proxy'))] ?? null;
-//    if ($lastCheck):
-//        echo $_COOKIE['last_data_check' . md5(request('proxy'))];
-//        exit;
-//    endif;
+
+    $proxyHASH = md5(request('proxy'));
+    $saved     = redisGet("DATA_".$proxyHASH);
+    if ($saved):
+        echo $saved;
+        return;
+    endif;
+
     $zte = new ZTEMF667();
     $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
@@ -98,11 +101,13 @@ if (request('action') === "DATA"):
         $deviceInfo = $devices[$s];
     }
 
-    echo json([
+    $lastData = json([
         'imei'     => $imei,
         'realtime' => $statistic,
         'charges_total' => formatSizeUnits(explode(",",$statistic)[6]),
         'device' => $deviceInfo
     ]);
 
+    redisSave("DATA_".$proxyHASH,$lastData,120);
+    echo $lastData;
 endif;
