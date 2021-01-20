@@ -24,7 +24,7 @@ if ($_POST)
     {
         foreach (post('data') as $proxies)
         {
-            $rc->get("http://ip-api.com/json/",[],[CURLOPT_PROXY => $proxies['proxy']],$proxies);
+            $rc->get("http://ip-api.com/json/",[],[CURLOPT_PROXY => $proxies['proxy'],CURLOPT_TIMEOUT => 35],$proxies);
         }
     }
     $responses = [];
