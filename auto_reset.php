@@ -21,7 +21,7 @@ for ($i = $startPort; $i <= $endPort; $i++)
 
 print_r("Total port: " . count($ports));
 
-$randSelect = array_rand($ports,12);
+$randSelect = array_rand($ports,5);
 
 $multi = new \RollingCurl\RollingCurl();
 foreach ($randSelect as $proxyIndex)
