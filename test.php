@@ -35,9 +35,15 @@ require "vendor/autoload.php";
 
 
 
-//$z = new \Networking\ModemAPI\ZTEMF667();
-//$z->setLocalProxy("login1:pass1@192.168.3.29:8091");
-//$z->createToken();
+//$z = new \Networking\ProxyService\ModemAPI\ZTEMF667();
+//$z->setLocalProxy("mroot:m2x*root@192.168.3.30:8091");
+//$common = $z->commonStatus();
+//
+//preg_match("@ppp_status : '(.*?)',@si",$common,$out);
+//print_r($out);
+//exit;
+//print_r($s);
+//print_r($common);
 //$z->disconnect();
 //sleep(10);
 //$z->connect();

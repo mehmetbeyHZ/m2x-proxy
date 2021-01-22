@@ -22,18 +22,12 @@ if (request('action') === 'RESET'):
     endif;
     session('last_reset_proxy' . md5(request('proxy')), time());
 
-    $zte = new ZTEMF667();
-    $zte->createToken();
-    $zte->setLocalProxy(request('proxy'));
-    $zte->disconnect();
-    sleep(20);
-    $zte->connect();
+    zteHardReConnect(request('proxy'));
     echo json(['status' => 'ok', 'message' => 'reset successful']);
 endif;
 
 if (request('action') === 'SMS'):
     $zte = new ZTEMF667();
-    $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
     echo json($zte->getSMS());
 endif;
@@ -67,7 +61,6 @@ if (request('action') === 'IMEI'):
     endif;
 
     $zte = new ZTEMF667();
-    $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
     $imei = $zte->getImei();
     setcookie('last_imei_get' . md5(request('proxy')), $imei, time() + 60);
@@ -85,7 +78,6 @@ if (request('action') === "DATA"):
     endif;
 
     $zte = new ZTEMF667();
-    $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
     $data = $zte->getStatistic();
     $imei = $zte->getImei();
@@ -111,3 +103,18 @@ if (request('action') === "DATA"):
     redisSave("DATA_".$proxyHASH,$lastData,120);
     echo $lastData;
 endif;
+
+
+function zteHardReConnect($proxy)
+{
+    $zte = new ZTEMF667();
+    $zte->setLocalProxy($proxy);
+    $zte->disconnect();
+    sleep(10);
+    $zte->connect();
+    sleep(10);
+    if ($zte->connectStatus() === 'ppp_disconnected')
+    {
+        zteHardReConnect($proxy);
+    }
+}

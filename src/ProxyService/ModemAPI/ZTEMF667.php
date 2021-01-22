@@ -17,6 +17,21 @@ class ZTEMF667
         $this->createToken();
     }
 
+    public function commonStatus()
+    {
+        return $this->mClient("common_refresh.asp")
+            ->addParam('now',time())
+            ->execute()
+            ->getResponse();
+    }
+
+    public function connectStatus()
+    {
+        $common = $this->commonStatus();
+        preg_match("@ppp_status : '(.*?)',@si",$common,$out);
+        return $out[1] ?? null;
+    }
+
     public static function smsContentDecode($text)
     {
         $result = "";
