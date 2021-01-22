@@ -32,6 +32,13 @@ if (request('action') === 'RESET'):
         $zte->connect();
         sleep(10);
         $connStatus = $zte->connectStatus();
+
+        if ($connStatus === null)
+        {
+            $connStatus = "REQ_ERR";
+            break;
+        }
+
         if ($connStatus === 'ppp_connected')
         {
             $isConnected = true;
