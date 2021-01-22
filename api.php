@@ -22,8 +22,8 @@ if (request('action') === 'RESET'):
     endif;
     session('last_reset_proxy' . md5(request('proxy')), time());
 
-    zteHardReConnect(request('proxy'));
-    echo json(['status' => 'ok', 'message' => 'reset successful']);
+    $connStatus = zteHardReConnect(request('proxy'));
+    echo json(['status' => 'ok', 'message' => 'reset successful', 'conn' => $connStatus]);
 endif;
 
 if (request('action') === 'SMS'):
@@ -113,8 +113,10 @@ function zteHardReConnect($proxy)
     sleep(10);
     $zte->connect();
     sleep(10);
-    if ($zte->connectStatus() === 'ppp_disconnected')
+    $connStatus = $zte->connectStatus();
+    if ($connStatus !== 'ppp_connected')
     {
         zteHardReConnect($proxy);
     }
+    return $connStatus;
 }
