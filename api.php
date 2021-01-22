@@ -21,8 +21,24 @@ if (request('action') === 'RESET'):
         exit;
     endif;
     session('last_reset_proxy' . md5(request('proxy')), time());
+    $connStatus = null;
+    $isConnected = false;
 
-    $connStatus = zteHardReConnect(request('proxy'));
+    while ($isConnected === true){
+        $zte = new ZTEMF667();
+        $zte->setLocalProxy(request('proxy'));
+        $zte->disconnect();
+        sleep(10);
+        $zte->connect();
+        sleep(15);
+        $connStatus = $zte->connectStatus();
+        if ($connStatus === 'ppp_connected')
+        {
+            $isConnected = true;
+            break;
+        }
+    }
+
     echo json(['status' => 'ok', 'message' => 'reset successful', 'conn' => $connStatus]);
 endif;
 
@@ -104,19 +120,3 @@ if (request('action') === "DATA"):
     echo $lastData;
 endif;
 
-
-function zteHardReConnect($proxy)
-{
-    $zte = new ZTEMF667();
-    $zte->setLocalProxy($proxy);
-    $zte->disconnect();
-    sleep(10);
-    $zte->connect();
-    sleep(10);
-    $connStatus = $zte->connectStatus();
-    if ($connStatus !== 'ppp_connected')
-    {
-        zteHardReConnect($proxy);
-    }
-    return $connStatus;
-}
