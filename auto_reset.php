@@ -30,7 +30,7 @@ foreach ($randSelect as $proxyIndex)
     $proxy = ROOT_PROXYUSR.":".ROOT_PROXYUSRPWD.'@'.$inet.':'.$myPort;
 
 
-    $multi->post("http://192.168.3.30/api.php",http_build_query(["proxy" => $proxy, "action" => "RESET","key" => "123456"]),[],[],["port" => $myPort]);
+    $multi->post("http://192.168.3.30/api.php",http_build_query(["proxy" => $proxy, "action" => "RESET","key" => "123456"]),[],[CURLOPT_TIMEOUT => 300],["port" => $myPort]);
 
 }
 $redis = redis();
@@ -39,7 +39,7 @@ $multi->setCallback(function (\RollingCurl\Request $request,\RollingCurl\Rolling
     $redis->set($rKey,Carbon::now("Europe/Istanbul")->format("Y-m-d H:i:s"));
     $redis->expire($rKey,600);
 
-    print_r($request->getResponseText());
+    print_r("\n".$request->getResponseText()."\n");
 
     $rollingCurl->clearCompleted();
     $rollingCurl->prunePendingRequestQueue();
