@@ -28,9 +28,9 @@ if (request('action') === 'RESET'):
         $zte = new ZTEMF667();
         $zte->setLocalProxy(request('proxy'));
         $zte->disconnect();
-        sleep(20);
+        sleep(10);
         $zte->connect();
-        sleep(15);
+        sleep(10);
         $connStatus = $zte->connectStatus();
         if ($connStatus === 'ppp_connected')
         {
