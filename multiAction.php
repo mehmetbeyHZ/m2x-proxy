@@ -16,7 +16,7 @@ if ($_POST)
                 "key" => $balancer["balancerKey"],
                 "proxy" => $balancer["proxy"]
             ]);
-            $rc->post("http://".$balancer['balancer']."/api.php",$data,[],[CURLOPT_TIMEOUT => 20],['balancer' => $balancer]);
+            $rc->post("http://".$balancer['balancer']."/api.php",$data,[],[CURLOPT_TIMEOUT => 120],['balancer' => $balancer]);
 
         }
     }
