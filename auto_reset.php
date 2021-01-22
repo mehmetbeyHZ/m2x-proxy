@@ -22,22 +22,22 @@ for ($i = $startPort; $i <= $endPort; $i++)
 print_r("Total port: " . count($ports));
 
 $randSelect = array_rand($ports,5);
-
+$redis = redis();
 $multi = new \RollingCurl\RollingCurl();
 foreach ($randSelect as $proxyIndex)
 {
     $myPort = $ports[$proxyIndex];
     $proxy = ROOT_PROXYUSR.":".ROOT_PROXYUSRPWD.'@'.$inet.':'.$myPort;
 
+    $rKey = 'RESET_PORT_'.$myPort;
+    $redis->set($rKey,Carbon::now("Europe/Istanbul")->format("Y-m-d H:i:s"));
+    $redis->expire($rKey,600);
 
     $multi->post("http://192.168.3.30/api.php",http_build_query(["proxy" => $proxy, "action" => "RESET","key" => "123456"]),[],[CURLOPT_TIMEOUT => 300],["port" => $myPort]);
 
 }
-$redis = redis();
-$multi->setCallback(function (\RollingCurl\Request $request,\RollingCurl\RollingCurl $rollingCurl) use(&$redis){
-    $rKey = 'RESET_PORT_'.$request->identifierParams['port'];
-    $redis->set($rKey,Carbon::now("Europe/Istanbul")->format("Y-m-d H:i:s"));
-    $redis->expire($rKey,600);
+$multi->setCallback(function (\RollingCurl\Request $request,\RollingCurl\RollingCurl $rollingCurl){
+
 
     print_r("\n".$request->getResponseText()."\n");
 
