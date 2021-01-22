@@ -21,6 +21,7 @@
     "ext-curl": "*",
     "mehmetbeyhz/rolling-curlx": "dev-master",
     "predis/predis": "^1.1",
-    "nesbot/carbon": "^2.43"
+    "nesbot/carbon": "^2.43",
+    "ext-json": "*"
   }
 }

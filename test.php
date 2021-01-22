@@ -6,8 +6,6 @@ require "vendor/autoload.php";
 //$client->set("name","mehmets");
 //$client->expire("name",30);
 
-var_dump(redisGet("last_reset_testingen"));
-
 
 //$tp = new \Networking\ProxyService\ThreeProxy();
 //$tp->setIPV4(\Networking\ProxyService\IPConf::getHomeINET());

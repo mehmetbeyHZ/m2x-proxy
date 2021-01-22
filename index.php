@@ -21,7 +21,7 @@ if (isset($_GET['_'])) {
         $rollingCurl->prunePendingRequestQueue();
         $rollingCurl->clearCompleted();
     });
-    $r->setSimultaneousLimit(50);
+    $r->setSimultaneousLimit(100);
     $r->execute();
 
     $r = new \RollingCurl\RollingCurl();
@@ -61,7 +61,7 @@ if (isset($_GET['_'])) {
         $rollingCurl->prunePendingRequestQueue();
         $rollingCurl->clearCompleted();
     });
-    $r->setSimultaneousLimit(50);
+    $r->setSimultaneousLimit(100);
     $r->execute();
 
     echo json($lastInfo);
