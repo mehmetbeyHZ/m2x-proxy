@@ -26,7 +26,7 @@ if (request('action') === 'RESET'):
     $zte->createToken();
     $zte->setLocalProxy(request('proxy'));
     $zte->disconnect();
-    sleep(10);
+    sleep(20);
     $zte->connect();
     echo json(['status' => 'ok', 'message' => 'reset successful']);
 endif;
