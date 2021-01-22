@@ -28,7 +28,7 @@ if (request('action') === 'RESET'):
         $zte = new ZTEMF667();
         $zte->setLocalProxy(request('proxy'));
         $zte->disconnect();
-        sleep(10);
+        sleep(20);
         $zte->connect();
         sleep(15);
         $connStatus = $zte->connectStatus();
