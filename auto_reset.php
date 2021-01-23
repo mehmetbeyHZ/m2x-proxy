@@ -7,7 +7,7 @@ use MClient\Request;
 require "vendor/autoload.php";
 $devices = json_decode(file_get_contents("database/devices.json"),true);
 $startPort = 8090;
-$endPort   = 8188;
+$endPort   = 8140;
 $ports     = [];
 $inet      = "192.168.3.30";
 
