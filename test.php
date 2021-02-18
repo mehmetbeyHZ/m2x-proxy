@@ -50,18 +50,18 @@ require "vendor/autoload.php";
 //sleep(10);
 
 // eth0 8092 2.25.244.155
-//$c = curl_init();
-//$o = [
-//    CURLOPT_URL => 'http://ip-api.com/json/',
-//    CURLOPT_RETURNTRANSFER => true,
-//    CURLOPT_FOLLOWLOCATION => true,
-//    CURLOPT_PROXY => 'login1:pass1@192.168.3.29:8090'
-//
-//];
-//curl_setopt_array($c, $o);
-//$resp = curl_exec($c);
-//curl_close($c);
-//print_r($resp);
+$c = curl_init();
+$o = [
+    CURLOPT_URL => 'http://ip-api.com/json/',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_PROXY => '192.168.3.51:3128'
+
+];
+curl_setopt_array($c, $o);
+$resp = curl_exec($c);
+curl_close($c);
+print_r($resp);
 
 //
 //preg_match_all("@var STR_AJAX_VALUE     = \"(.*?)\";@si",$resp,$out);
