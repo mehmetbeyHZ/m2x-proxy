@@ -37,13 +37,13 @@ php 3proxyconf.php
 
 sudo apt-get install supervisor
 
-printf "[program:mtproxy]\ncommand=3proxy /etc/3proxy/3proxy.cfg\nautostart=true\nautorestart=true\nchmod=0777\nchown=appuser:supervisor\n" > /etc/supervisor/conf.d/mtproxy.conf
-
-echo "SUPERVISORCTL UPDATING..."
-sudo supervisorctl update
-
-echo "RESTARTING SUPERVISORCTL..."
-sudo supervisorctl restart mtproxy
+#printf "[program:mtproxy]\ncommand=3proxy /etc/3proxy/3proxy.cfg\nautostart=true\nautorestart=true\nchmod=0777\nchown=appuser:supervisor\n" > /etc/supervisor/conf.d/mtproxy.conf
+#
+#echo "SUPERVISORCTL UPDATING..."
+#sudo supervisorctl update
+#
+#echo "RESTARTING SUPERVISORCTL..."
+#sudo supervisorctl restart mtproxy
 
 sudo apt-get install redis-server
 
