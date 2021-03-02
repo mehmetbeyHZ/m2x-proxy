@@ -1,16 +1,17 @@
 <?php
 require "vendor/autoload.php";
+define("ROOTFOLDER", dirname($_SERVER['SCRIPT_NAME']));
 ini_set('display_errors', 1);
 if (isset($_GET['_'])) {
     $r = new \RollingCurl\RollingCurl();
-    $timeout = 20;
+    $timeout = 10;
     foreach (PROXY_BALANCER as $balancer) {
         $data = http_build_query([
             'action' => 'NETCONF',
             'key' => $balancer['key'],
             'proxy' => "NO_PROXY"
         ]);
-        $r->post("http://{$balancer['address']}/api.php", $data, [], [CURLOPT_TIMEOUT => $timeout], $balancer);
+        $r->post("http://{$balancer['address']}/apiLTE.php", $data, [], [CURLOPT_TIMEOUT => $timeout], $balancer);
     }
     $configs = [];
     $r->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl) use (&$configs) {
@@ -45,7 +46,7 @@ if (isset($_GET['_'])) {
                     'proxy' => $proxyUri
                 ]);
 
-                $r->post("http://{$server['balancer']['address']}/api.php", $postData, [], [CURLOPT_TIMEOUT => $timeout], $userData);
+                $r->post("http://{$server['balancer']['address']}/apiLTE.php", $postData, [], [CURLOPT_TIMEOUT => $timeout], $userData);
             }
         }
     }

@@ -5,7 +5,7 @@ namespace Networking\ProxyService;
 class USB
 {
 
-    protected $modems = ["ZTE WCDMA","Huawei Technologies Co., Ltd."];
+    protected $modems = ["ZTE WCDMA","Huawei Technologies Co., Ltd.","T & A"];
 
     public function getAllModems()
     {

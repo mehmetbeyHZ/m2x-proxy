@@ -1,0 +1,8 @@
+{
+  "name": "html",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "usb-detection": "^4.10.0"
+  }
+}

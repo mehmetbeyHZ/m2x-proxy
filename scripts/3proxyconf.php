@@ -9,5 +9,5 @@ $tp->setIPV4(IPConf::getHomeINET());
 $tp = $tp->createConf(true);
 print_r($tp);
 print_r("RESTARTING...");
-$restart = shell_exec("sudo supervisorctl restart mtproxy");
-print_r($restart);
+//$restart = shell_exec("sudo supervisorctl restart mtproxy");
+//print_r($restart);

@@ -39,3 +39,18 @@ nmcli con down static1 ; nmcli con up static2
 
 #profil ekleme
 nmcli con add type ethernet con-name static2 ifname eth0 ip4 192.168.0.108/24 gw4 192.168.0.1
+
+
+
+# 4.5G Configure
+sudo usb_modeswitch -v 1bbb -p f000 -c /etc/usb_modeswitch.d/alcatel.conf
+conf :
+
+DefaultVendor=  0x1bbb
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1bbb
+TargetProduct=  0x0017
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+#MessageContent="55534243123456780000000000000600000000000000000000000000000000"

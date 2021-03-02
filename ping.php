@@ -4,14 +4,11 @@ require "vendor/autoload.php";
 
 $rc = new \RollingCurl\RollingCurl();
 
-for ($j = 0; $j < 60; $j++)
+for ($j = 0; $j < 1000; $j++)
 {
 
-    for ($i =8090; $i <= 8132; $i++)
-    {
-        $proxy = "login1:pass1@195.174.177.104:".$i;
-        $rc->get("https://jsonplaceholder.typicode.com/todos/1",[],[CURLOPT_PROXY => $proxy,CURLOPT_TIMEOUT => 35],['pr' => $proxy]);
-    }
+    $proxy = "login1:pass1@192.168.3.30:".rand(8090,8095);
+    $rc->get("https://jsonplaceholder.typicode.com/todos/2",[],[CURLOPT_PROXY => $proxy,CURLOPT_TIMEOUT => 35],['pr' => $proxy]);
 }
 $success = 0;
 $error = 0;
@@ -32,6 +29,8 @@ $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCu
     if ($request->getResponseError())
     {
         print_r("CURL_ERROR:" . $request->getResponseError()."\n");
+        print_r($request->identifierParams['pr']."\n");
+
     }
 
     if (strpos($request->getResponseError(),"502"))
@@ -41,7 +40,8 @@ $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCu
 
     }
 
-//    print_r($request->getResponseText()."\n\n");
+    print_r($request->getResponseText()."\n\n");
+    print_r("Total: ". ($error + $success));
     $rollingCurl->prunePendingRequestQueue();
     $rollingCurl->clearCompleted();
 });
