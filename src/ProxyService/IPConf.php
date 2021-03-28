@@ -24,7 +24,7 @@ class IPConf
 
             preg_match("@broadcast (.*?) @si",$connection,$broadcast);
 
-            preg_match("@netmask (.*?) @si",$connection,$broadcast);
+            preg_match("@netmask (.*?) @si",$connection,$netmask);
 
             if (!in_array(trim($connectionName[1]),$this->unReadModem))
             {

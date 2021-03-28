@@ -2,6 +2,7 @@
 require "vendor/autoload.php";
 
 
+
 //$mv = new \Networking\ProxyService\ModemAPI\MW40V1();
 //$mv->setLocalProxy('mroot:m2x*root@192.168.3.30:8090');
 //$login = $mv->login();
@@ -70,19 +71,19 @@ require "vendor/autoload.php";
 
 
 //$s = shell_exec("sudo supervisorctl start mtproxy");
-//print_r($s);
-$prefix = 100;
-for ($i = 1; $i <= 10; $i++)
-{
-    $prefix++;
-    $profileName = "profile{$i}";
-    $ipv4 = "192.168.1.".$prefix;
-    shell_exec("nmcli con delete $profileName");
-    shell_exec("nmcli con add type ethernet con-name $profileName");
-}
-
-# 3proxy Conf
-
+////print_r($s);
+//$prefix = 100;
+//for ($i = 1; $i <= 10; $i++)
+//{
+//    $prefix++;
+//    $profileName = "profile{$i}";
+//    $ipv4 = "192.168.1.".$prefix;
+//    shell_exec("nmcli con delete $profileName");
+//    shell_exec("nmcli con add type ethernet con-name $profileName");
+//}
+//
+//# 3proxy Conf
+//
 
 
 //$z = new \Networking\ProxyService\ModemAPI\ZTEMF667();

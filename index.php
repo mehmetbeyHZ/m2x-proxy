@@ -1,71 +1,109 @@
 <?php
+
+use Networking\ProxyService\IPConf;
+use Networking\ProxyService\ThreeProxy;
+
 require "vendor/autoload.php";
 define("ROOTFOLDER", dirname($_SERVER['SCRIPT_NAME']));
 ini_set('display_errors', 1);
+$devicesDB = json_decode(file_get_contents("database/devices.json"),true);
+$redis = redis();
 if (isset($_GET['_'])) {
-    $r = new \RollingCurl\RollingCurl();
-    $timeout = 10;
-    foreach (PROXY_BALANCER as $balancer) {
-        $data = http_build_query([
-            'action' => 'NETCONF',
-            'key' => $balancer['key'],
-            'proxy' => "NO_PROXY"
-        ]);
-        $r->post("http://{$balancer['address']}/apiLTE.php", $data, [], [CURLOPT_TIMEOUT => $timeout], $balancer);
-    }
-    $configs = [];
-    $r->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl) use (&$configs) {
-        $configs[] = [
-            'response' => json_decode($request->getResponseText(), true),
-            'balancer' => $request->identifierParams
-        ];
-        $rollingCurl->prunePendingRequestQueue();
-        $rollingCurl->clearCompleted();
-    });
-    $r->setSimultaneousLimit(100);
-    $r->execute();
 
-    $r = new \RollingCurl\RollingCurl();
+    $ip = new IPConf();
+    $tp = new ThreeProxy();
+    $interfaceList = [];
+    $inetList      = [];
+    $connections  = $ip->getAllConnections(true);
+    $proxyConf = $ip->proxyConfParse();
 
-    foreach ($configs as $server) {
-        if (!isset($server['response']['networks'])) {
-            continue;
-        }
-        foreach ($server['response']['networks'] as $network) {
-            $networkName = $network['cName'];
-            if (isset($server['response']['config'][$networkName])) {
-                $conf = $server['response']['config'][$networkName];
-                $ip = $conf['ip'];
-                $port = $conf['port'];
-                $proxyUri = ROOT_PROXYUSR . ':' . ROOT_PROXYUSRPWD . '@' . $ip . ':' . $port;
-                $userData = ['network' => $network, 'config' => $conf, 'balancer' => $server['balancer'], 'proxy' => $proxyUri];
+    $systemInfo   = [];
+    $usageInfo    = [];
+    $fullResponse = [];
 
-                $postData = http_build_query([
-                    'action' => 'DATA',
-                    'key' => '123456',
-                    'proxy' => $proxyUri
-                ]);
+    $timeout      = 3;
 
-                $r->post("http://{$server['balancer']['address']}/apiLTE.php", $postData, [], [CURLOPT_TIMEOUT => $timeout], $userData);
+    foreach ($connections as $connection)
+    {
+        if (isset($proxyConf[$connection["cName"]]))
+        {
+            $modemInterface = str_replace(".255",".1",$connection["broadcast"]);
+
+
+            if ($redis->exists("RESET_PROXY_TIMEX:".trim($modemInterface)) !== 1)
+            {
+                $proxyPort = $proxyConf[$connection["cName"]]["ip"];
+                $interfaceList[$connection["cName"]] = trim($modemInterface);
+                $inetList[$connection["cName"]] = $connection["inet"];
             }
         }
     }
-    $lastInfo = [];
-    $r->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl) use (&$lastInfo) {
 
-        $deviceInfo = json_decode($request->getResponseText(), true);
-        $lastInfo[] = [
-            'info' => $deviceInfo,
-            'identifier' => $request->identifierParams
+
+    $rc = new \RollingCurl\RollingCurl();
+    foreach ($interfaceList as $modemName => $interface)
+    {
+        $uri = "http://$interface/jrd/webapi?api=GetSystemInfo";
+        $modemInfo = $proxyConf[$modemName];
+        $modemInfo["inet"] = $inetList[$modemName];
+        $modemInfo['proxy'] = ROOT_PROXYUSR.':'.ROOT_PROXYUSRPWD.'@'.$modemInfo['ip'].":".$modemInfo['port'];
+        $rc->post("http://$interface/jrd/webapi?api=GetSystemInfo",'{"jsonrpc":"2.0","method":"GetSystemInfo","params":null,"id":"13.1"}',[],[CURLOPT_TIMEOUT => $timeout],['interface' => $interface, 'modem_info' => $modemInfo]);
+    }
+    $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl)  use(&$systemInfo){
+        $data = json_decode($request->getResponseText(),true);
+        $systemInfo[$request->identifierParams['interface']]['system_info'] = [
+            'imei' => $data['result']['IMEI'] ?? null,
+            'mac' => $data['result']['MacAddress'] ?? null
         ];
+        $systemInfo[$request->identifierParams['interface']]['modem_info'] = $request->identifierParams['modem_info'];
+        $rollingCurl->prunePendingRequestQueue();
+        $rollingCurl->clearCompleted();
+    });
+    $rc->setSimultaneousLimit(100);
+    $rc->execute();
+
+    // Usage Info --------------------------------------------------------
+    foreach ($systemInfo as $interface => $info)
+    {
+        $rc->post("http://$interface/jrd/webapi?api=GetUsageSettings",'{"jsonrpc":"2.0","method":"GetUsageSettings","params":null,"id":"7.3"}',[],[CURLOPT_TIMEOUT => $timeout],['interface' => $interface]);
+    }
+    $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl)  use(&$systemInfo){
+        $data = json_decode($request->getResponseText(),true);
+        $systemInfo[$request->identifierParams['interface']]['usage_info'] = [
+            'used_data' => isset($data['result']['UsedData']) ? formatSizeUnits($data['result']['UsedData']) : formatSizeUnits(0)
+        ];
+        $rollingCurl->prunePendingRequestQueue();
+        $rollingCurl->clearCompleted();
+    });
+    $rc->setSimultaneousLimit(100);
+    $rc->execute();
+
+    // USAGE STATUS -------------------------------------------------
+    foreach ($systemInfo as $interface => $info)
+    {
+        $rc->post("http://$interface/jrd/webapi?api=GetUsageSettings",'{"jsonrpc":"2.0","method":"GetSystemStatus","params":null,"id":"13.4"}',[],[CURLOPT_TIMEOUT => $timeout],['interface' => $interface]);
+    }
+    $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl)  use(&$systemInfo,&$devicesDB){
+        $data = json_decode($request->getResponseText(),true);
+        $systemInfo[$request->identifierParams['interface']]['system_status'] = $data['result'] ?? [];
+        $imei = $systemInfo[$request->identifierParams['interface']]['system_info']['imei'];
+
+        $deviceInfo = [];
+        $s =  array_search($imei, array_column($devicesDB,'imei'), true);
+        if (is_int($s)){
+            $deviceInfo = $devicesDB[$s];
+        }
+
+        $systemInfo[$request->identifierParams['interface']]['device_info'] = $deviceInfo;
 
         $rollingCurl->prunePendingRequestQueue();
         $rollingCurl->clearCompleted();
     });
-    $r->setSimultaneousLimit(100);
-    $r->execute();
+    $rc->setSimultaneousLimit(100);
+    $rc->execute();
 
-    echo json($lastInfo);
+    echo json($systemInfo);
+
 } else {
     require "app/header.php";
     ?>
@@ -123,6 +161,7 @@ if (isset($_GET['_'])) {
                 <th>Tel.</th>
                 <th>INET</th>
                 <th>Int.Kullanım</th>
+                <th>Şarj</th>
                 <th>PROXY</th>
                 <th>AYAR</th>
             </tr>
@@ -184,53 +223,31 @@ if (isset($_GET['_'])) {
             $.get("index.php", {"_": true}, function (data) {
                 $("div#preloader").html('');
                 let myData = JSON.parse(data);
-                $("div#totalConn").html(myData.length + " Connection");
-                for (let i = 0; i < myData.length; i++) {
-                    let item = myData[i];
-
-                    if(item.info == null)
-                    {
-                        $("tbody#proxies").append(`<tr>
-                        <td class="center">
-
-                        </td>
-                        <td>${item.identifier.network.cName}</td>
-                        <td>n/A</td>
-                        <td>n/A</td>
-                        <td>${item.identifier.network.inet}</td>
-                        <td>n/A</td>
-                        <td>${item.identifier.proxy}</td>
-                <td class="center">
-                    <a id="resetProxy" class="btn blue" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">RESTART</a>
-                    <a  id="checkProxy" class="btn blue darken-2" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">CHECK</a>
-                    <a id="getSms" data-phone="000" class="btn yellow darken-2 black-text" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">SMS</a>
-                </td>
-</tr>`);
-
-                        continue
-                    }
-
-                    connectedIMEI.push(item.info.imei);
+                $("div#totalConn").html(Object.entries(myData).length + " Connection");
+                for (const [key, value] of Object.entries(myData)) {
                     $("tbody#proxies").append(`<tr>
-                <td class="center" id="proxyI${item.info.imei}" data-balancer="${item.identifier.balancer.address}" data-bkey="${item.identifier.balancer.key}" data-proxy="${item.identifier.proxy}">
+                <td class="center" id="proxyI${value.system_info.imei}" data-inet="${key}" data-proxy="${value.modem_info.proxy}">
                       <label>
-                        <input type="checkbox" data-imei="${item.info.imei}" class="proxySelector"/>
+                        <input type="checkbox" data-imei="${value.system_info.imei}" class="proxySelector"/>
                         <span style="padding-left: 18px!important;"></span>
                       </label>
                 </td>
-                <td>${item.identifier.network.cName}</td>
-                <td>${item.info.imei}</td>
-                <td>${item.info.device.phone}</td>
-                <td>${item.identifier.network.inet}</td>
-                <td>${item.info.charges_total}</td>
-                <td>${item.identifier.proxy}</td>
+                <td>${value.modem_info.device}</td>
+                <td>${value.system_info.imei}</td>
+                <td>${value.device_info.phone}</td>
+                <td>${value.modem_info.inet}</td>
+                <td>${value.usage_info.used_data}</td>
+                <td>%${value.system_status.bat_cap}</td>
+                <td>${value.modem_info.proxy}</td>
                 <td class="center">
-                    <a id="resetProxy" class="btn blue" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">RESTART</a>
-                    <a  id="checkProxy" class="btn blue darken-2" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">CHECK</a>
-                    <a id="getSms" data-phone="${item.info.device.phone}" class="btn yellow darken-2 black-text" data-ipv4="${item.identifier.balancer.address}" data-proxy="${item.identifier.proxy}">SMS</a>
+                    <a id="resetProxy" class="btn blue" data-inet="${value.modem_info.inet}">RESTART</a>
+                    <a  id="checkProxy" data-inet="${value.modem_info.inet}" class="btn blue darken-2">CHECK</a>
+                    <a id="getSms" data-phone="${value.device_info.phone}" data-inet="${value.modem_info.inet}" class="btn yellow darken-2 black-text">SMS</a>
                 </td>
             </tr>`);
                 }
+
+
                 $("table#example").DataTable({
                     "columnDefs": [
                         { "type": "file-size", "targets": 0 }
@@ -338,11 +355,10 @@ if (isset($_GET['_'])) {
             for (let i = 0; i < selectedOrderIds.length; i++) {
                 let imei = selectedOrderIds[i];
                 let field = $("#proxyI" + imei);
-                let balancer = field.attr('data-balancer');
-                let balancerKey = field.attr('data-bkey');
+                let inet = field.attr('data-inet');
                 let proxy = field.attr('data-proxy');
 
-                resetItems.push({proxy, balancer, balancerKey})
+                resetItems.push({proxy, inet})
             }
             $.post("multiAction.php", {data: resetItems, type}, function (data) {
                 $("#loadingModal").modal('close');
