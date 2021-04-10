@@ -6,11 +6,13 @@ sudo apt install php php-cli php-fpm php-json php-common php-mysql php-zip php-g
 echo "INSTALL NGINX..."
 sudo apt-get install nginx
 
+sudo service apache2 stop
+
 sudo service nginx stop
 
-rm /etc/nginx/conf.d/default
+rm /etc/nginx/sites-enabled/default
 
-sudo cp nginx.conf /etc/nginx/conf.d/default
+sudo cp nginx.conf /etc/nginx/sites-enabled/default
 
 sudo service nginx restart
 
@@ -35,6 +37,7 @@ sudo chmod -R 777 /etc/3proxy/3proxy.cfg
 echo "RUN 3proxy.conf"
 php 3proxyconf.php
 
+echo "INSTALL SUPERVISOR"
 sudo apt-get install supervisor
 
 #printf "[program:mtproxy]\ncommand=3proxy /etc/3proxy/3proxy.cfg\nautostart=true\nautorestart=true\nchmod=0777\nchown=appuser:supervisor\n" > /etc/supervisor/conf.d/mtproxy.conf
@@ -45,10 +48,20 @@ sudo apt-get install supervisor
 #echo "RESTARTING SUPERVISORCTL..."
 #sudo supervisorctl restart mtproxy
 
+echo "INSTALL CURL"
+sudo apt-get install curl
+
+echo "INSTALL COMPOSER"
+sudo curl -s https://getcomposer.org/installer | php
+
+sudo mv composer.phar /usr/local/bin/composer
+
+echo "INSTALL REDIS"
 sudo apt-get install redis-server
 
 sudo apt-get install php-redis
 
+echo "SERVER SETUP..."
 git clone https://github.com/mehmetbeyHZ/m2x-proxy.git
 
 rm -rf /var/www/html/

@@ -42,7 +42,7 @@ class ThreeProxy
         $TPConfBuilder = new TPConfBuilder();
         $TPConfBuilder->setLine("monitor logs.txt");
         $TPConfBuilder->setLogs("logs2.txt");
-        $TPConfBuilder->setLine("maxconn 1000");
+        $TPConfBuilder->setLine("maxconn 15000");
         $TPConfBuilder->setLine("nscache 65536");
         $TPConfBuilder->setLine("timeouts 1 5 30 60 180 1800 15 60");
         $TPConfBuilder->setAuth("login1","pass1");
