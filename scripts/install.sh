@@ -31,6 +31,8 @@ sudo make install
 cd ..
 rm -rf 3proxy
 
+sudo mv alcatel.conf /etc/usb_modeswitch.d/alcatel.conf
+
 echo "3PROXY PHP CONFIGURE"
 sudo chmod -R 777 /etc/3proxy/3proxy.cfg
 

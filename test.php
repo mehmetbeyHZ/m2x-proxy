@@ -1,7 +1,7 @@
 <?php
 require "vendor/autoload.php";
-$responseError = "OpenSSL SSL_connect:  SSL_ERROR_SYSCALL in connection to jsonplaceholder.typicode.com:443";
-var_dump(strpos($responseError,"SSL_ERROR_SYSCALL"));
+//$responseError = "OpenSSL SSL_connect:  SSL_ERROR_SYSCALL in connection to jsonplaceholder.typicode.com:443";
+//var_dump(strpos($responseError,"SSL_ERROR_SYSCALL"));
 //$mv = new \Networking\ProxyService\ModemAPI\MW40V1();
 //$mv->setLocalProxy('mroot:m2x*root@192.168.3.30:8090');
 //$login = $mv->login();
@@ -9,6 +9,7 @@ var_dump(strpos($responseError,"SSL_ERROR_SYSCALL"));
 
 
 
+print_r(\Networking\ProxyService\IPConf::getHomeModemName());
 
 //function encryptx($data)
 //{

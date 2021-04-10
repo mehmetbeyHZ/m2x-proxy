@@ -68,4 +68,25 @@ class IPConf
         }
         return null;
     }
+
+    public static function getHomeModemName()
+    {
+        $netAdapters = shell_exec("ifconfig");
+        $connections = explode("\n\n",$netAdapters);
+        $homeInet = null;
+
+        foreach (array_filter($connections) as $connection)
+        {
+            preg_match("@inet (.*?) @si",$connection,$inet);
+            if (isset($inet[1]) && strpos($inet[1],".168.3.")){
+                $homeInet = $inet[1];
+            }
+            if ($homeInet !== null)
+            {
+                preg_match("@(.*?): flags@si",$connection,$modemName);
+                return trim($modemName[1]);
+            }
+        }
+        return null;
+    }
 }
