@@ -54,7 +54,7 @@ if (request('action') === 'RECONF'):
     $tp = new ThreeProxy();
     $tp->setIPV4(IPConf::getHomeINET());
     $tp = $tp->createConf(true);
-//    $restart = shell_exec("sudo supervisorctl restart mtproxy");
+    $restart = shell_exec("sudo service 3proxy reload");
     echo json(['status' => 'ok', 'message' => 'updated and restarted.']);
 endif;
 

@@ -120,8 +120,9 @@ if (isset($_GET['_'])) {
             <a class="btn black" id="re_conf" data-ipv4="<?= $b['address'] ?>"><?= $b['address'] ?> RE_CONF </a>
         <?php endforeach; ?>
     </div>
+
     <div class="container">
-        <div class="card wg_shadow">
+        <div class="card wg_shadow" style="margin-left: 5px; margin-right: 5px; max-width: 100%!important; z-index: 889;position: -webkit-sticky!important; position: sticky!important;top: 0!important;">
             <div class="card-content">
                 <div style="display: flex; justify-content: space-between;">
 
@@ -137,16 +138,15 @@ if (isset($_GET['_'])) {
                 </div>
             </div>
         </div>
-    </div>
+
 
     <!-- Dropdown Structure -->
-    <ul id='dropdown1' class='dropdown-content'>
-        <li><a href="#!" id="multiAction" data-action="RESTART">RESTART</a></li>
-        <li><a href="#!" id="multiAction" data-action="CHECK">CHECK</a></li>
-    </ul>
+        <ul id='dropdown1' class='dropdown-content'>
+            <li><a href="#!" id="multiAction" data-action="RESTART">RESTART</a></li>
+            <li><a href="#!" id="multiAction" data-action="CHECK">CHECK</a></li>
+        </ul>
 
 
-    <div class="container">
         <table id="example" class="display" style="width:100%">
             <thead>
             <tr>
@@ -169,6 +169,7 @@ if (isset($_GET['_'])) {
             <tbody id="proxies">
             </tbody>
         </table>
+
     </div>
 
     <div style="width: 100%;margin-left: auto;margin-right: auto;margin-top: 25px" id="preloader">
@@ -240,12 +241,13 @@ if (isset($_GET['_'])) {
                 <td>%${value.system_status.bat_cap}</td>
                 <td>${value.modem_info.proxy}</td>
                 <td class="center">
-                    <a id="resetProxy" class="btn blue" data-inet="${value.modem_info.inet}">RESTART</a>
-                    <a  id="checkProxy" data-inet="${value.modem_info.inet}" class="btn blue darken-2">CHECK</a>
-                    <a id="getSms" data-phone="${value.device_info.phone}" data-inet="${value.modem_info.inet}" class="btn yellow darken-2 black-text">SMS</a>
+                    <a  id="checkProxy" data-proxy="${value.modem_info.proxy}" data-inet="${value.modem_info.inet}" class="btn blue darken-2">CHECK</a>
                 </td>
             </tr>`);
                 }
+
+                // <a id="resetProxy" class="btn blue" data-inet="${value.modem_info.inet}">RESTART</a>
+                // <a id="getSms" data-phone="${value.device_info.phone}" data-inet="${value.modem_info.inet}" class="btn yellow darken-2 black-text">SMS</a>
 
 
                 $("table#example").DataTable({

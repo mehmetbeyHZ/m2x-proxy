@@ -1,48 +1,81 @@
 <?php
 
-use Carbon\Carbon;
-use MClient\MultiRequest;
-use MClient\Request;
+use Networking\ProxyService\IPConf;
 
 require "vendor/autoload.php";
-$devices = json_decode(file_get_contents("database/devices.json"),true);
-$startPort = 8090;
-$endPort   = 8140;
-$ports     = [];
-$inet      = "192.168.3.30";
+$simultaneous = 0;
+$maxSimule    = 5;
+$responses = [];
+$hasAnyReset = false;
 
-for ($i = $startPort; $i <= $endPort; $i++)
+while (true)
 {
-//    print_r('RESET_PORT_'.$i);
-    if (redisGet('RESET_PORT_'.$i) === null){
-        $ports[] = $i;
+    $connectionInfo = connectionInfo();
+    $rc = new \RollingCurl\RollingCurl();
+    $redis = redis();
+    foreach ($connectionInfo as $connection)
+    {
+        $canReset = $redis->exists('MODEM_RESET_AT:'.$connection['gateway']);
+        if ($canReset === 0 && $connection["gateway"] !== "")
+        {
+            $hasAnyReset = true;
+            $rc->post("http://".$connection['gateway']."/jrd/webapi?api=SetDeviceReboot",'{"jsonrpc":"2.0","method":"SetDeviceReboot","params":null,"id":"13.5"}',[],[CURLOPT_TIMEOUT => 20],['gateway' => $connection['gateway']]);
+            $simultaneous++;
+            redisSave('MODEM_RESET_AT:'.$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),3600);
+            redisSave("RESET_PROXY_TIMEX:".$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),60);
+        }
+        if ($simultaneous === $maxSimule){
+            break;
+        }
     }
+
+    $rc->setCallback(function (\RollingCurl\Request $request, \RollingCurl\RollingCurl $rollingCurl)  use(&$responses){
+
+        $responses[] = [
+            'response' => $request->getResponseText(),
+            'info' => $request->identifierParams
+        ];
+        $rollingCurl->prunePendingRequestQueue();
+        $rollingCurl->clearCompleted();
+    });
+    $rc->setSimultaneousLimit(100);
+    $rc->execute();
+    print_r("\n".$simultaneous ." WAS RESET");
+    $simultaneous = 0;
+    $responses = [];
+    $sleepSeconds = $hasAnyReset ? 60 : 5;
+    print_r("\n$sleepSeconds SECONDS SLEEPING... \n");
+    sleep($sleepSeconds);
+    $hasAnyReset = false;
 }
 
-print_r("Total port: " . count($ports));
 
-$randSelect = array_rand($ports,5);
-$redis = redis();
-$multi = new \RollingCurl\RollingCurl();
-foreach ($randSelect as $proxyIndex)
+
+
+
+
+
+function connectionInfo()
 {
-    $myPort = $ports[$proxyIndex];
-    $proxy = ROOT_PROXYUSR.":".ROOT_PROXYUSRPWD.'@'.$inet.':'.$myPort;
+    $ip = new IPConf();
+    $connections  = $ip->getAllConnections(true);
+    $proxyConf = $ip->proxyConfParse();
+    $connectionInfo = [];
+    foreach ($connections as $connection)
+    {
+        if (isset($proxyConf[$connection["cName"]]))
+        {
+            $modemInterface = str_replace(".255",".1",$connection["broadcast"]);
+            $proxyPort = $proxyConf[$connection["cName"]]["ip"];
 
-    $rKey = 'RESET_PORT_'.$myPort;
-    $redis->set($rKey,Carbon::now("Europe/Istanbul")->format("Y-m-d H:i:s"));
-    $redis->expire($rKey,600);
-
-    $multi->post("http://192.168.3.30/api.php",http_build_query(["proxy" => $proxy, "action" => "RESET","key" => "123456"]),[],[CURLOPT_TIMEOUT => 300],["port" => $myPort]);
-
+            $connectionInfo[] = [
+                'gateway' => trim($modemInterface),
+                'inet' => $connection['inet'],
+                'connection_name' => $connection['cName'],
+                'ip' => $proxyConf[$connection["cName"]]['ip'],
+                'port' =>  $proxyConf[$connection["cName"]]['port'],
+            ];
+        }
+    }
+    return $connectionInfo;
 }
-$multi->setCallback(function (\RollingCurl\Request $request,\RollingCurl\RollingCurl $rollingCurl){
-
-
-    print_r("\n".$request->getResponseText()."\n");
-
-    $rollingCurl->clearCompleted();
-    $rollingCurl->prunePendingRequestQueue();
-});
-$multi->setSimultaneousLimit(100);
-$multi->execute();
