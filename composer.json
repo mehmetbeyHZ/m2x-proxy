@@ -22,6 +22,7 @@
     "mehmetbeyhz/rolling-curlx": "dev-master",
     "predis/predis": "^1.1",
     "nesbot/carbon": "^2.43",
-    "ext-json": "*"
+    "ext-json": "*",
+    "vlucas/phpdotenv": "^5.3"
   }
 }

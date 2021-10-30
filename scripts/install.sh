@@ -45,6 +45,7 @@ sudo apt-get install supervisor
 #printf "[program:mtproxy]\ncommand=3proxy /etc/3proxy/3proxy.cfg\nautostart=true\nautorestart=true\nchmod=0777\nchown=appuser:supervisor\n" > /etc/supervisor/conf.d/mtproxy.conf
 printf "[program:auto_reset]\ncommand=php /var/www/html/auto_reset.php\nnumprocs=1\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/auto_reset.conf
 printf "[program:device_keeper]\ncommand=php /var/www/html/device-keeper.php\nnumprocs=1\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/device_keeper.conf
+printf "[program:network_manager]\ncommand=php /var/www/html/network-manager.php\nnumprocs=1\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/network_manager.conf
 
 
 echo "INSTALL CURL"
