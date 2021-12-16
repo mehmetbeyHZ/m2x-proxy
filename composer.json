@@ -16,6 +16,12 @@
       "email": "mehmetbeyhz@gmail.com"
     }
   ],
+  "repositories":[
+    {
+      "type": "vcs",
+      "url": "git@github.com:mehmetbeyhz/tp-link-m7200-api.git"
+    }
+  ],
   "require": {
     "mehmetbeyhz/mclient": "dev-master",
     "ext-curl": "*",
@@ -23,6 +29,8 @@
     "predis/predis": "^1.1",
     "nesbot/carbon": "^2.43",
     "ext-json": "*",
-    "vlucas/phpdotenv": "^5.3"
+    "vlucas/phpdotenv": "^5.3",
+    "mehmetbeyhz/easy-json-mapper" : "dev-master",
+    "mehmetbeyhz/tp-link-m7200-api": "dev-master"
   }
 }

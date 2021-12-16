@@ -115,6 +115,8 @@ if (isset($_GET['_'])) {
         <div id="totalConn">Checking...</div>
     </div>
 
+    <h2 class="center"><?=$_ENV["MODEM_TYPE"]?></h2>
+
     <div class="container">
         <?php foreach (PROXY_BALANCER as $b) : ?>
             <a class="btn black" id="re_conf" data-ipv4="<?= $b['address'] ?>"><?= $b['address'] ?> RE_CONF </a>

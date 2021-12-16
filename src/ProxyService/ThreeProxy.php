@@ -31,8 +31,10 @@ class ThreeProxy
             if ($connection->getConnectionName() === 'wlo1') {
                 continue;
             }
-            $builder .= "proxy -a -i{$this->ipv4} -p{$startPort} -De{$connection->getConnectionName()}\n";
-            $startPort++;
+            if (strpos($connection->getConnectionName(),"usb") !== false){
+                $builder .= "proxy -a -i{$this->ipv4} -p{$startPort} -De{$connection->getConnectionName()}\n";
+                $startPort++;
+            }
         }
         return $builder;
     }

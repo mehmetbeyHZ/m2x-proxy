@@ -7,9 +7,12 @@ require "vendor/autoload.php";
 //$login = $mv->login();
 //print_r($mv->getUsageSettings());
 
+//$tp = (new \TPLink\TPLinkM7200("admin","192.168.5.1"));
+//$auth = $tp->authentication();
+//$tp->rebootDevice($auth->getToken());
 
 
-print_r(\Networking\ProxyService\IPConf::getHomeModemName());
+//print_r(\Networking\ProxyService\IPConf::getHomeModemName());
 
 //function encryptx($data)
 //{

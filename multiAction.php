@@ -10,9 +10,10 @@ if ($_POST)
     {
         foreach (post('data') as $item){
 
-            redisSave("RESET_PROXY_TIMEX:".$item['inet'],10,60);
-            $rc->post("http://".$item['inet']."/jrd/webapi?api=SetDeviceReboot",'{"jsonrpc":"2.0","method":"SetDeviceReboot","params":null,"id":"13.5"}',[],[CURLOPT_TIMEOUT => 20],['inet' => $item['inet']]);
-
+            if ($_ENV["MODEM_TYPE"] == "ALCATEL"){
+                redisSave("RESET_PROXY_TIMEX:".$item['inet'],10,60);
+                $rc->post("http://".$item['inet']."/jrd/webapi?api=SetDeviceReboot",'{"jsonrpc":"2.0","method":"SetDeviceReboot","params":null,"id":"13.5"}',[],[CURLOPT_TIMEOUT => 20],['inet' => $item['inet']]);
+            }
         }
     }
     if (request('type') === 'CHECK')

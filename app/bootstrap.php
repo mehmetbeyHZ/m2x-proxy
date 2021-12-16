@@ -7,6 +7,13 @@ $b = new ProxyBalancer();
 
 $b->setBalancer(\Networking\ProxyService\IPConf::getHomeINET(),"123456");
 //$b->setBalancer("192.168.3.42","123456");
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(realpath('.'));
+    $dotenv->load();
+}catch (Exception $e){
+    print_r($e->getMessage());
+    exit();
+}
 
 define("PROXY_BALANCER",$b->getAllBalancer());
 define("OUT_IP","195.174.177.104");

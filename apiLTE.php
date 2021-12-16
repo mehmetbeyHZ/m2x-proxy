@@ -2,7 +2,6 @@
 ini_set('display_errors',1);
 use Networking\ProxyService\IPConf;
 use Networking\ProxyService\ModemAPI\MW40V1;
-use Networking\ProxyService\ModemAPI\ZTEMF667;
 use Networking\ProxyService\ThreeProxy;
 
 require "vendor/autoload.php";

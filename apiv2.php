@@ -11,11 +11,12 @@ if (!$_REQUEST || !request('key') || request('key') !== $apiKey || !request('act
 
 if (request('action')){
     $balancer = PROXY_BALANCER[request('ipv4')];
-    echo (new \MClient\Request("http://".request('ipv4')."/apiLTE.php"))
+    echo (new \MClient\Request("http://".$_ENV["MAIN_IPV4"]."/apiLTE.php"))
         ->setCookieFile(realpath('.').'/mfcookies/client-'.md5(request('proxy')).".txt")
         ->addPost('action',request('action'))
         ->addPost('key',$balancer['key'])
         ->addPost('proxy',request("proxy"))
+        ->addCurlOptions(CURLOPT_TIMEOUT,5)
         ->execute()
         ->getResponse();
 }

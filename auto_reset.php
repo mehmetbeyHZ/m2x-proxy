@@ -10,6 +10,8 @@ $hasAnyReset = false;
 
 while (true)
 {
+    $dotenv = Dotenv\Dotenv::createImmutable(realpath('.'));
+    $dotenv->load();
     $connectionInfo = connectionInfo();
     $rc = new \RollingCurl\RollingCurl();
     $redis = redis();
@@ -18,11 +20,22 @@ while (true)
         $canReset = $redis->exists('MODEM_RESET_AT:'.$connection['gateway']);
         if ($canReset === 0 && $connection["gateway"] !== "")
         {
-            $hasAnyReset = true;
-            $rc->post("http://".$connection['gateway']."/jrd/webapi?api=SetDeviceReboot",'{"jsonrpc":"2.0","method":"SetDeviceReboot","params":null,"id":"13.5"}',[],[CURLOPT_TIMEOUT => 20],['gateway' => $connection['gateway']]);
-            $simultaneous++;
-            redisSave('MODEM_RESET_AT:'.$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),3600);
-            redisSave("RESET_PROXY_TIMEX:".$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),60);
+            if ($_ENV["MODEM_TYPE"] == "ALCATEL"){
+                $hasAnyReset = true;
+                $rc->post("http://".$connection['gateway']."/jrd/webapi?api=SetDeviceReboot",'{"jsonrpc":"2.0","method":"SetDeviceReboot","params":null,"id":"13.5"}',[],[CURLOPT_TIMEOUT => 20],['gateway' => $connection['gateway']]);
+                $simultaneous++;
+                redisSave('MODEM_RESET_AT:'.$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),3600);
+                redisSave("RESET_PROXY_TIMEX:".$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),60);
+            }
+            if ($_ENV["MODEM_TYPE"] == "TPLINK"){
+                $hasAnyReset = true;
+                $simultaneous++;
+                $tp = new \TPLink\TPLinkM7200("admin",$connection["gateway"]);
+                $auth = $tp->authentication();
+                $tp->rebootDevice($auth->getToken());
+                redisSave('MODEM_RESET_AT:'.$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),3600);
+                redisSave("RESET_PROXY_TIMEX:".$connection['gateway'],\Carbon\Carbon::now('Europe/Istanbul'),60);
+            }
         }
         if ($simultaneous === $maxSimule){
             break;
